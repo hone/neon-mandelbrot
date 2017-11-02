@@ -1,0 +1,17 @@
+[package]
+name = "neon-mandelbrot"
+version = "0.1.0"
+authors = ["Terence Lee <hone02@gmail.com>"]
+license = "MIT"
+build = "build.rs"
+
+[lib]
+name = "neon_mandelbrot"
+crate-type = ["dylib"]
+
+[build-dependencies]
+neon-build = "0.1.20"
+
+[dependencies]
+neon = "0.1.20"
+ndarray = "0.10.12"
