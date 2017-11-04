@@ -20,20 +20,20 @@ fn mandelbrot(mut call: Call) -> JsResult<JsArrayBuffer> {
     let pan_x = fetch_arg::<JsNumber>(&mut call, 4)?.value() as f32;
     let pan_y = fetch_arg::<JsNumber>(&mut call, 5)?.value() as f32;
 
-    let buffer_size = (2 * width * height) as u32;
-    let mut image = JsArrayBuffer::new(call.scope, buffer_size)?;
     let mandelbrot = Mandelbrot::new(width, height);
     let rust_image = mandelbrot.generate(max_iterations, scaling_factor, pan_x, pan_y);
+    let buffer_size = (2 * rust_image.len()) as u32;
+    let mut js_image = JsArrayBuffer::new(call.scope, buffer_size)?;
     for x in 0..width {
         for y in 0..height {
             let index = x * width + y;
-            image.grab(|mut slice| {
-                slice[index] = rust_image[[x, y]];
+            js_image.grab(|mut slice| {
+                slice[index] = rust_image[index];
             });
         }
     }
 
-    Ok(image)
+    Ok(js_image)
 }
 
 register_module!(m, {

@@ -1,5 +1,5 @@
 extern crate ndarray;
-use self::ndarray::{Array2, IxDyn};
+use self::ndarray::Array1;
 
 pub struct Mandelbrot {
     width: usize,
@@ -17,13 +17,14 @@ impl Mandelbrot {
     }
 
     // neon JsArrayType only grabs in u8 views, so need to use u8
-    pub fn generate(&self, max_iterations: usize, scaling_factor: f32, pan_x: f32, pan_y: f32) -> Array2<u8> {
-        let mut result = Array2::zeros([self.width, self.height]);
+    pub fn generate(&self, max_iterations: usize, scaling_factor: f32, pan_x: f32, pan_y: f32) -> Array1<u8> {
+        let mut result = Array1::zeros([self.width * self.height]);
         for x in 0..self.width {
             for y in 0..self.height {
+                let index = x * self.width + y;
                 let c_re = (x as f32 / scaling_factor) - pan_x;
                 let c_im = (y as f32 / scaling_factor) - pan_y;
-                result[[x, y]] = self.belongs(c_re, c_im, max_iterations);
+                result[index] = self.belongs(c_re, c_im, max_iterations);
             }
         }
 
