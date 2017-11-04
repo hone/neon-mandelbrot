@@ -4,20 +4,24 @@ extern crate neon;
 mod mandelbrot;
 
 use neon::vm::{Call, JsResult, Lock};
-use neon::js::JsString;
+use neon::js::{JsInteger, JsNumber, Value};
 use neon::js::binary::JsArrayBuffer;
 use mandelbrot::Mandelbrot;
 
-fn mandelbrot(call: Call) -> JsResult<JsArrayBuffer> {
-    let scope = call.scope;
-    let width = 600 as usize;
-    let height = 600 as usize;
-    let max_iterations = 10;
-    let scaling_factor = 200.0;
-    let pan_x = 2.0;
-    let pan_y = 1.5;
+fn fetch_arg<'a, T: Value>(call: &mut Call<'a>, index: i32) -> JsResult<'a, T> {
+    call.arguments.require(call.scope, index)?.check::<T>()
+}
+
+fn mandelbrot(mut call: Call) -> JsResult<JsArrayBuffer> {
+    let width = fetch_arg::<JsInteger>(&mut call, 0)?.value() as usize;
+    let height = fetch_arg::<JsInteger>(&mut call, 1)?.value() as usize;
+    let max_iterations = fetch_arg::<JsInteger>(&mut call, 2)?.value() as usize;
+    let scaling_factor = fetch_arg::<JsNumber>(&mut call, 3)?.value() as f32;
+    let pan_x = fetch_arg::<JsNumber>(&mut call, 4)?.value() as f32;
+    let pan_y = fetch_arg::<JsNumber>(&mut call, 5)?.value() as f32;
+
     let buffer_size = (2 * width * height) as u32;
-    let mut image = JsArrayBuffer::new(scope, buffer_size)?;
+    let mut image = JsArrayBuffer::new(call.scope, buffer_size)?;
     let mandelbrot = Mandelbrot::new(width, height);
     let rust_image = mandelbrot.generate(max_iterations, scaling_factor, pan_x, pan_y);
     for x in 0..width {
