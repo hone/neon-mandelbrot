@@ -23,18 +23,14 @@ impl Mandelbrot {
             for y in 0..self.height {
                 let c_re = (x as f32 / scaling_factor) - pan_x;
                 let c_im = (y as f32 / scaling_factor) - pan_y;
-                if self.belongs(c_re, c_im, max_iterations) {
-                    result[[x, y]] = 1 as u8;
-                } else {
-                    result[[x, y]] = 0 as u8;
-                }
+                result[[x, y]] = self.belongs(c_re, c_im, max_iterations);
             }
         }
 
         result
     }
 
-    fn belongs(&self, c_re: f32, c_im: f32, max_iterations: usize) -> bool {
+    fn belongs(&self, c_re: f32, c_im: f32, max_iterations: usize) -> u8 {
         let mut iteration = 0;
         let mut x: f32 = 0.0;
         let mut y: f32 = 0.0;
@@ -46,6 +42,10 @@ impl Mandelbrot {
             iteration += 1;
         }
 
-        iteration < max_iterations
+        if iteration < max_iterations {
+            ((iteration as f32 / max_iterations as f32) * 100.0) as u8
+        } else {
+            0 as u8
+        }
     }
 }
