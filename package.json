@@ -13,6 +13,18 @@
     "neon-cli": "^0.1.20"
   },
   "scripts": {
-    "install": "neon build"
+    "install": "node-pre-gyp install --fallback-to-build"
+  },
+  "devDependencies": {
+    "node-pre-gyp": "^0.6.39"
+  },
+  "bundledDependencies": [
+    "node-pre-gyp"
+  ],
+  "binary": {
+    "module_name": "index",
+    "module_path": "./lib/native",
+    "host": "https://github.com/hone/neon-mandelbrot/releases/download/",
+    "remote_path": "{version}"
   }
 }
