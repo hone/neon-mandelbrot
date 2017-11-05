@@ -1,4 +1,6 @@
+extern crate rayon;
 extern crate time;
+use self::rayon::prelude::*;
 use self::time::PreciseTime;
 
 pub struct Mandelbrot {
@@ -27,6 +29,21 @@ impl Mandelbrot {
         }).collect();
         let end_time = PreciseTime::now();
         eprintln!("Rust timing: {}", start_time.to(end_time));
+        result
+    }
+
+    pub fn generate_parallel(&self, max_iterations: usize, scaling_factor: f32, pan_x: f32, pan_y: f32) -> Vec<u8> {
+        let start_time = PreciseTime::now();
+        let result = (0..(self.width as u32 * self.height as u32)).into_par_iter().map(|index| {
+            let x = index / self.width as u32;
+            let y = index - x * self.width as u32;
+            let c_re = (x as f32 / scaling_factor) - pan_x;
+            let c_im = (y as f32 / scaling_factor) - pan_y;
+            self.belongs(c_re, c_im, max_iterations)
+        }).collect();
+        let end_time = PreciseTime::now();
+        eprintln!("Rust timing: {}", start_time.to(end_time));
+
         result
     }
 
